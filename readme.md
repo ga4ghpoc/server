@@ -1,11 +1,8 @@
 # GA4GH API PoC #
 
-> **Disclaimer: It is not recommended to put any customer or confidential data into this PoC environment as it is not secure. Going against these recommendations is at your own risk.**
+This Proof-of-Concept (PoC) aims to provide instructions to set up server for a limited evaluation exercise.
 
-This PoC aims to provide instructions to set up a cross-site structure where the API can be evaluated. **This PoC is not secure and as such:**
-
-- **Please never run this in a production environment** (where you store confidential customer data) or in the same network with production servers
-- The PoC only aims to establish if network connectivity and API calls work, secure storage and access management is not in the scope
+- **Please never run this in a production environment** (where you store confidential customer data) or in the same network with production servers.
 
 ## Infrastructure requirements ##
 
@@ -15,7 +12,7 @@ The recommended network setup for the PoC is the following:
 - Network layer 3 addressing (simple addresses) for the machine. E.g.: 192.168.X.X network. DHCP and DNS should be available by default.
 - A public IP address is required with port forwarding enabled (inbound - towards the machine). The public IP address can be anything, as long as it's reachable from all other participants.
 - The target port (**8000** by default) needs to be allowed for inbound/outbound to all participant addresses.
-- The machine needs at least NAT-based internet access to download components and to communicate with endpoints (HTTP+HTTPS+FTP)
+- The machine needs at least NAT-based internet access to download components for the purposes of following these instructions (HTTP+HTTPS+FTP)
 
 ### Hardware ###
 The required hardware setup for the PoC is the following:
@@ -37,7 +34,10 @@ Once your VM is up and running, execute the following commands to install the Do
     sudo usermod -aG docker $(whoami)
     sudo service docker restart
 
-### Preparing Sample Data ###
+### Preparing Sample Data (To Test Set-up) ###
+
+In order to test the set-up of this installation, we detail some sample data. Further instructions will be provided to specify the data to be used in the actual PoC exercise. 
+
 Once logged in to the VM you will need to pick a folder where you want to store sample data. Make sure you have permissions to write that folder before you decide on it. If you are unsure where you are in the file system, you can run the `pwd` command to see what the full path is.
 
 Once the folder is created download the sample data with the following command:
@@ -58,7 +58,7 @@ In case permissions are wrong on the ga4gh-data folder these commands can be run
     sudo chown -R root:root /the/target/path/ga4gh-data
 	sudo chmod -R 0777 /the/target/path/ga4gh-data
 
-### Run the GA4GH API (as a Docker container) ###
+### Run the GA4GH API Server (as a Docker container) ###
 
 At this point you will have all the prerequisites in place:
 
@@ -82,13 +82,17 @@ The command will trigger the following actions:
 2. It will mount the sample data folder to the container to path /data within the container
 3. It will start the container and kick off the API
 
-**The API with the sample data is ready to use at this point.**
+**The API server with the sample data is ready to use at this point.**
 
-## Using the PoC ##
+## Testing the API Server ##
 
-To test whether the API is responding or not you can run the following command from a linux machine that has direct connection to the VM host running the container (keep in mind that if you used a port other than 8000 you will need to change the command):
+To test whether the API is running correctly use this command from a linux machine that has direct connection to the VM host running the container (keep in mind that if you used a port other than 8000 you will need to change the command):
 
 	curl --data '{}' --header 'Content-Type: application/json' http://VMS_IP_ADDRESS:8000/ga4gh/datasets/search
+
+The expected response for this should be:
+
+	{"nextPageToken": "", "datasets": [{"info": {}, "description": "", "id": "WyIxa2ctcDMtc3Vic2V0Il0", "name": "1kg-p3-subset"}]}
 
 You can find the API reference (what commands and methods are supported) on:
 
@@ -98,10 +102,12 @@ Because the VM has the container port forwarded to 8000 by default, if you targe
 
 ### Restarting the container ###
 
-Do the following commands for the time being to restart the container on the host as it is prone to get stuck with a PID (mind the port and path if you are using another):
+If you need to stop the container or VM it is running on, the following steps are needed to restart.
+
+Do the following commands to restart the container on the host as it is prone to get stuck with a PID error on restart (mind the port and path if you are using another):
 
 	docker kill ga4gh_server
-    docker rmi ga4gh_server
+    docker rm ga4gh_server
 	docker run -e GA4GH_DATA_SOURCE=/data -v /home/ubuntu/ga4gh-data:/data -d -p 8000:80 --name ga4gh_server ga4ghapi/server:latest
 
 ### Adding data to the PoC ###
@@ -126,9 +132,11 @@ More information on Data repository and supported methods:
 
 - http://ga4gh-reference-implementation.readthedocs.io/en/latest/configuration.html#data-repository
 
-## Testing the PoC ##
+## Dry-run Installation (Optional) ##
 
-If you would need to test the PoC before deploying it to a VM, you can try it with Vagrant with VirtualBox (install them first). Clone the git repository to your machine and cd into the folder.
+If you wish to dry-run the installation deploying it to the VM used for the PoC, you can try it with Vagrant with VirtualBox (install them first). Note that this is an option step and is not a substitute for the full set-up described above.
+
+First, clone the git repository to your machine and cd into the folder.
 
 	vagrant up
 
