@@ -37,7 +37,6 @@ tests/data/registry.db
 *.iso
 *.jar
 *.rar
-*.tar
 *.zip
  
 # Logs and databases #
