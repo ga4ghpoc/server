@@ -11,7 +11,7 @@ The recommended network setup for the PoC is the following:
 
 - Network layer 3 addressing (simple addresses) for the machine. E.g.: 192.168.X.X network. DHCP and DNS should be available by default.
 - A public IP address is required with port forwarding enabled (inbound - towards the machine). The public IP address can be anything, as long as it's reachable from all other participants.
-- The target port (**8000** by default) needs to be allowed for inbound/outbound to all participant addresses.
+- The target port (**80** by default) needs to be allowed for inbound/outbound to all participant addresses.
 - The machine needs at least NAT-based internet access to download components for the purposes of following these instructions (HTTP+HTTPS+FTP)
 
 ### Hardware ###
@@ -70,11 +70,11 @@ You can start the container with the following command:
     docker run -e GA4GH_DATA_SOURCE=/data -v /the/target/path/ga4gh-data:/data -d -p MYPORT:80 --name ga4gh_server ga4ghapi/server:latest
 
 - We must pass the full path to folder which contains sample data e.g. **/tmp/data/ga4gh-data** or **/home/ubuntu/ga4gh-data**
-- We must specify a port to which we expose the server [MYPORT] e.g **8000:80**
+- We must specify a port to which we expose the server [MYPORT] e.g **80:80**
 
 Example command:
 
-    docker run -e GA4GH_DATA_SOURCE=/data -v /home/ubuntu/ga4gh-data:/data -d -p 8000:80 --name ga4gh_server ga4ghapi/server:latest
+    docker run -e GA4GH_DATA_SOURCE=/data -v /home/ubuntu/ga4gh-data:/data -d -p 80:80 --name ga4gh_server ga4ghapi/server:latest
 
 The command will trigger the following actions:
 
@@ -86,9 +86,9 @@ The command will trigger the following actions:
 
 ## Testing the API Server ##
 
-To test whether the API is running correctly use this command from a linux machine that has direct connection to the VM host running the container (keep in mind that if you used a port other than 8000 you will need to change the command):
+To test whether the API is running correctly use this command from a linux machine that has direct connection to the VM host running the container (keep in mind that if you used a port other than 80 you will need to change the command):
 
-	curl --data '{}' --header 'Content-Type: application/json' http://VMS_IP_ADDRESS:8000/ga4gh/datasets/search
+	curl --data '{}' --header 'Content-Type: application/json' http://VMS_IP_ADDRESS/ga4gh/datasets/search
 
 The expected response for this should be:
 
@@ -96,9 +96,9 @@ The expected response for this should be:
 
 You can find the API reference (what commands and methods are supported) on:
 
-	http://VMS_IP_ADDRESS:8000/ga4gh/
+	http://VMS_IP_ADDRESS/ga4gh/
 
-Because the VM has the container port forwarded to 8000 by default, if you target the VM's IP address with any browser and load up the above page resource, it will get to the container and you will see the API reference page.
+Because the VM has the container port forwarded to 80 by default, if you target the VM's IP address with any browser and load up the above page resource, it will get to the container and you will see the API reference page.
 
 ### Restarting the container ###
 
@@ -108,7 +108,7 @@ Do the following commands to restart the container on the host as it is prone to
 
 	docker kill ga4gh_server
     docker rm ga4gh_server
-	docker run -e GA4GH_DATA_SOURCE=/data -v /home/ubuntu/ga4gh-data:/data -d -p 8000:80 --name ga4gh_server ga4ghapi/server:latest
+	docker run -e GA4GH_DATA_SOURCE=/data -v /home/ubuntu/ga4gh-data:/data -d -p 80:80 --name ga4gh_server ga4ghapi/server:latest
 
 ### Adding data to the PoC ###
 
